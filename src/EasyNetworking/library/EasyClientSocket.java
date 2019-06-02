@@ -1,4 +1,4 @@
-package EasyNetworking;
+package EasyNetworking.library;
 
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -7,7 +7,7 @@ import java.net.Socket;
 /**
  * @author Hitesh Ale
  * Date - 5 / 20 / 2019
- * @version 1.0
+ * @version 0.1
  */
 
 public class EasyClientSocket extends Socket {
@@ -28,6 +28,7 @@ public class EasyClientSocket extends Socket {
 
     public void connect(String hostname, int port) {
         try {
+            handler = new ClientHandler();
             println("Connecting...");
             super.connect(new InetSocketAddress(hostname, port));
             println("Connected to " + this.getInetAddress().getHostName());

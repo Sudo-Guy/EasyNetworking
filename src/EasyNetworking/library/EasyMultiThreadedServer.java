@@ -1,4 +1,4 @@
-package EasyNetworking;
+package EasyNetworking.library;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

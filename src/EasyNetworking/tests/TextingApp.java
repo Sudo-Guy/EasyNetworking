@@ -1,12 +1,15 @@
-package EasyNetworking;
+package EasyNetworking.tests;
+
+import EasyNetworking.library.EasyClientSocket;
+import EasyNetworking.library.EasyServerSocket;
 
 import java.io.IOException;
 import java.util.Scanner;
 
 public class TextingApp {
 
-    EasyClientSocket clientSocket;
-    EasyServerSocket serverSocket;
+    private EasyClientSocket clientSocket;
+    private EasyServerSocket serverSocket;
 
     public static void main(String[] args) {
         TextingApp c = new TextingApp();
@@ -35,7 +38,7 @@ public class TextingApp {
     public class Client {
         String username;
 
-        public Client(String host, int port, String username) {
+        Client(String host, int port, String username) {
             clientSocket = new EasyClientSocket();
             clientSocket.connect(host, port);
             this.username = username;
@@ -51,7 +54,7 @@ public class TextingApp {
         public class Incoming extends Thread {
             EasyClientSocket in;
 
-            public Incoming(EasyClientSocket in) {
+            Incoming(EasyClientSocket in) {
                 this.in = in;
             }
 
@@ -65,7 +68,7 @@ public class TextingApp {
         public class OutGoing extends Thread {
             EasyClientSocket out;
 
-            public OutGoing(EasyClientSocket out) {
+            OutGoing(EasyClientSocket out) {
                 this.out = out;
             }
 
@@ -78,7 +81,7 @@ public class TextingApp {
         }
     }
 
-    public class Server {
+    class Server {
         String username;
 
         public Server(int port, String username) {
@@ -91,14 +94,14 @@ public class TextingApp {
             this.username = username;
         }
 
-        public void start() {
+        void start() {
             Thread incoming = new Incoming(serverSocket);
             Thread outgoing = new OutGoing(serverSocket);
             incoming.start();
             outgoing.start();
         }
 
-        public class Incoming extends Thread {
+        class Incoming extends Thread {
             EasyServerSocket in;
 
             public Incoming(EasyServerSocket in) {
@@ -112,10 +115,10 @@ public class TextingApp {
             }
         }
 
-        public class OutGoing extends Thread {
+        class OutGoing extends Thread {
             EasyServerSocket out;
 
-            public OutGoing(EasyServerSocket out) {
+            OutGoing(EasyServerSocket out) {
                 this.out = out;
             }
 

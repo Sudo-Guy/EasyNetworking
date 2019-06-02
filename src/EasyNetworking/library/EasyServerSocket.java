@@ -1,4 +1,4 @@
-package EasyNetworking;
+package EasyNetworking.library;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -12,26 +12,28 @@ import java.net.ServerSocket;
  * </p>
  *
  * @author Hitesh Ale
- * @version 1.0
- * @see java.net.ServerSocket
+ * @version 0.1
+ * @see ServerSocket
  * @since 2019-05-20
  */
 
 public class EasyServerSocket extends ServerSocket {
 
     /**
-     * Hold
+     * ServerHandler is used to hold the information of the input and output and the client Socket
      * @see ServerHandler
+     * @see Handler
      */
     protected ServerHandler handler;
 
 
     /**
-     * calls the Constructor in ServerSocket while also setting a default timeout of 10000 milliseconds
+     * Calls the Constructor in ServerSocket while also setting a default timeout of 10000 milliseconds
      *
      * @param port port number where EasyServerSocket will be created at
-     * @throws IOException N/A
+     * @throws IOException Throws IOException when port cannot be allocated
      * @see IOException
+     * @see ServerSocket Constructor ServerSocket(in port)is called from this Constuctor
      */
 
     public EasyServerSocket(int port) throws IOException {
@@ -44,17 +46,18 @@ public class EasyServerSocket extends ServerSocket {
     }
 
     /**
-     * This method will allow the Server to allow clients to connect to itself
-     *
+     * This method will allow Clients connect to the Server
+     * This method also creates a new server Handler
      * @param printOut Determines if program will print out Server and Connected Client details
      */
 
     public void accept(boolean printOut) {
+        if (handler == null)
+            handler = new ServerHandler();
         if (handler.getClient() != null) {
             if (printOut)
                 System.out.println("Server may already be connected to client");
         }
-        handler = new ServerHandler();
         try {
             if (printOut)
                 System.out.println("Server - " + this.getInetAddress().getHostName() + " is waiting on " + this.getLocalPort() + "\nIP address: " + this.getInetAddress().getHostAddress());
@@ -71,13 +74,18 @@ public class EasyServerSocket extends ServerSocket {
     }
 
     /**
-     * This method will allow the Server to allow clients to connect to itself
+     * This method will allow Clients connect to the Server
+     * This method also creates a new server Handler
      *
      * @param timeout  Will determine how long the server will wait for a connection in milliseconds
      * @param printOut Determines if program will print out Server and Connected Client details
+     * @throws IOException Thrown when Input or Output Stream are not able to be instantiated
+     * @see IOException
      */
 
     public void accept(int timeout, boolean printOut) {
+        if (handler == null)
+            handler = new ServerHandler();
         if (handler.getClient() != null) {
             if (printOut)
                 System.out.println("Server may already be connected to client");
@@ -99,12 +107,16 @@ public class EasyServerSocket extends ServerSocket {
     }
 
     /**
-     * This method allows you to send any objects to your connected client
+     * This method allows you to send any objects to your connected Client
      *
      * @param object This is the object being sent to your Client
+     * @throws IOException Thrown when Output Stream is unable to write the object to itself
      */
 
     public void send(Object object) {
+        if (handler == null) {
+            println("ServerHandler handler is null at " + this.getClass());
+        }
         try {
             this.handler.getOutputStream().writeObject(serialize(object));
         } catch (IOException E) {
@@ -117,7 +129,7 @@ public class EasyServerSocket extends ServerSocket {
      *
      * @param obj This is the object being serialized
      * @return serialized Object as a byte[]
-     * @throws IOException
+     * @throws IOException Thrown when Output Streams are unable to write the object to itself
      */
 
     private byte[] serialize(Object obj) throws IOException {
@@ -131,9 +143,13 @@ public class EasyServerSocket extends ServerSocket {
      * This method waits until a Object is sent by a Client
      *
      * @return This returns the Object sent by the Client
+     * @throws IOException Thrown when Input Streams are unable to write the object to itself
      */
 
     public Object receive() {
+        if (handler == null) {
+            println("ServerHandler handler is null at " + this.getClass());
+        }
         try {
             return deserialize((byte[]) this.handler.getInputStream().readObject());
         } catch (ClassNotFoundException | IOException E) {
@@ -143,12 +159,12 @@ public class EasyServerSocket extends ServerSocket {
     }
 
     /**
-     * Deserializes a byte[]
+     * Helper method for the receive(); method, Converts byte[] into an object
      *
      * @param data byte[] that needs to be converted
      * @return This returns the converted Object
-     * @throws IOException            N/A
-     * @throws ClassNotFoundException N/A
+     * @throws IOException Thrown when Output Streams are unable to write the object to itself
+     * @throws ClassNotFoundException Thrown when byte[] data is unable to be converted to an Object (byte[] is not serialized to an Object)
      */
 
     private Object deserialize(byte[] data) throws IOException, ClassNotFoundException {
@@ -192,9 +208,10 @@ public class EasyServerSocket extends ServerSocket {
     }
 
     /**
-     * Used to return handler
+     * Used to return handler and allows access to internal output and input streams and client socket data
      *
      * @return ServerHandler
+     * @see ServerHandler
      */
 
     public ServerHandler getHandler() {

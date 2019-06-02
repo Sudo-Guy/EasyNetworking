@@ -1,4 +1,7 @@
-package EasyNetworking;
+package EasyNetworking.tests;
+
+import EasyNetworking.library.EasyClientSocket;
+import EasyNetworking.library.EasyServerSocket;
 
 import java.io.IOException;
 import java.util.Scanner;
@@ -108,8 +111,8 @@ public class Examples {
         }
 
         private void exampleTWO() {
-            sleep(1000);
             System.out.println("*********************EXAMPLE*TWO**************************");
+            sleep(1000);
 
             //Makes client wait 3 seconds to allow time for server to come online
             sleep(3000);
