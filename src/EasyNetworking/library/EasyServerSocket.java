@@ -1,4 +1,4 @@
-package EasyNetworking;
+package EasyNetworking.library;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -12,7 +12,7 @@ import java.net.ServerSocket;
  * </p>
  *
  * @author Hitesh Ale
- * @version 1.0
+ * @version 0.1
  * @see java.net.ServerSocket
  * @since 2019-05-20
  */

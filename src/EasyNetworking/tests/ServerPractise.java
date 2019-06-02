@@ -1,4 +1,4 @@
-package EasyNetworking;
+package EasyNetworking.tests;
 
 public class ServerPractise {
 

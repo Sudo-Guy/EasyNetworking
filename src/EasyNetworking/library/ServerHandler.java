@@ -1,4 +1,4 @@
-package EasyNetworking;
+package EasyNetworking.library;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -18,7 +18,7 @@ public class ServerHandler extends Handler {
         super();
     }
 
-    protected Socket getClient() {
+    public Socket getClient() {
         return client;
     }
 

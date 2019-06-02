@@ -1,4 +1,4 @@
-package EasyNetworking;
+package EasyNetworking.library;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -17,7 +17,7 @@ public class Handler {
         this.out = out;
     }
 
-    protected ObjectInputStream getInputStream() {
+    public ObjectInputStream getInputStream() {
         return in;
     }
 
@@ -25,7 +25,7 @@ public class Handler {
         this.in = in;
     }
 
-    protected ObjectOutputStream getOutputStream() {
+    public ObjectOutputStream getOutputStream() {
         return out;
     }
 
