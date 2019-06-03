@@ -5,7 +5,6 @@ import EasyNetworking.library.EasyServerSocket;
 
 import java.io.IOException;
 import java.util.Scanner;
-
 public class Examples {
 
     public static void main(String[] args) {
