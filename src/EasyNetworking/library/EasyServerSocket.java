@@ -1,19 +1,20 @@
 package EasyNetworking.library;
 
-import java.io.*;
+import java.io.IOException;
 import java.net.ServerSocket;
 
 /**
- * <h1>EasyServerSocket</h1>
+ * <h1>EasyServerSocket - EasyServerSocket class implements simplified methods for ServerSocket,</h1>
  *
  * <p>
  * EasyServerSocket class implements simplified methods for ServerSocket,
- * Simply as made to make your life easier
+ * Simply made to make your life easier
  * </p>
  *
  * @author Hitesh Ale
  * @version 0.1
  * @see ServerSocket
+ * @see ServerHandler
  * @since 2019-05-20
  */
 
@@ -25,6 +26,8 @@ public class EasyServerSocket extends ServerSocket {
      * @see Handler
      */
     protected ServerHandler handler;
+
+    protected String serverName;
 
 
     /**
@@ -40,6 +43,27 @@ public class EasyServerSocket extends ServerSocket {
         super(port);
         try {
             this.setSoTimeout(10000);
+            serverName = "Server";
+        } catch (IOException E) {
+            println(E.toString());
+        }
+    }
+
+    /**
+     * Calls the Constructor in ServerSocket while also setting a default timeout of 10000 milliseconds and naming error messages
+     *
+     * @param port       port number where EasyServerSocket will be created at
+     * @param serverName This serverName will name error messages allowing debugging code to be easier
+     * @throws IOException Throws IOException when port cannot be allocated
+     * @see IOException
+     * @see ServerSocket Constructor ServerSocket(in port)is called from this Constuctor
+     */
+
+    public EasyServerSocket(int port, String serverName) throws IOException {
+        super(port);
+        try {
+            this.setSoTimeout(10000);
+            this.serverName = serverName;
         } catch (IOException E) {
             println(E.toString());
         }
@@ -49,24 +73,24 @@ public class EasyServerSocket extends ServerSocket {
      * This method will allow Clients connect to the Server
      * This method also creates a new server Handler
      * @param printOut Determines if program will print out Server and Connected Client details
+     * @throws IOException This can be thrown at creation of new ServerHandler when super.accept() has failed
+     * @see IOException
+     * @see ServerHandler
      */
 
     public void accept(boolean printOut) {
-        if (handler == null)
-            handler = new ServerHandler();
-        if (handler.getClient() != null) {
+        if (handler != null && handler.getClient() != null) {
             if (printOut)
-                System.out.println("Server may already be connected to client");
+                println("Server may already be connected to client");
         }
         try {
             if (printOut)
-                System.out.println("Server - " + this.getInetAddress().getHostName() + " is waiting on " + this.getLocalPort() + "\nIP address: " + this.getInetAddress().getHostAddress());
-            handler.setClient(this.accept());
-            if (printOut)
-                System.out.println("Server - Just connected to " + handler.getClient().getRemoteSocketAddress() + "\nClient Name - " + handler.getClient().getInetAddress().getHostName() + "\nClient Address - " + handler.getClient().getInetAddress().getHostAddress());
+                println(this.getInetAddress().getHostName() + " is waiting on " + this.getLocalPort() + "\nIP address: " + this.getInetAddress().getHostAddress());
 
-            handler.setInputStream(new ObjectInputStream(handler.getClient().getInputStream()));
-            handler.setOutputStream(new ObjectOutputStream(handler.getClient().getOutputStream()));
+            handler = new ServerHandler(this.accept());
+
+            if (printOut)
+                println("Just connected to " + handler.getClient().getRemoteSocketAddress() + "\nClient Name - " + handler.getClient().getInetAddress().getHostName() + "\nClient Address - " + handler.getClient().getInetAddress().getHostAddress());
 
         } catch (IOException E) {
             println(E.toString());
@@ -75,31 +99,29 @@ public class EasyServerSocket extends ServerSocket {
 
     /**
      * This method will allow Clients connect to the Server
-     * This method also creates a new server Handler
+     * This method also creates a new ServerHandler
      *
      * @param timeout  Will determine how long the server will wait for a connection in milliseconds
      * @param printOut Determines if program will print out Server and Connected Client details
-     * @throws IOException Thrown when Input or Output Stream are not able to be instantiated
+     * @throws IOException This can be thrown at creation of new ServerHandler when super.accept() has failed
      * @see IOException
+     * @see ServerHandler
      */
 
     public void accept(int timeout, boolean printOut) {
-        if (handler == null)
-            handler = new ServerHandler();
-        if (handler.getClient() != null) {
+        if (handler != null && handler.getClient() != null) {
             if (printOut)
-                System.out.println("Server may already be connected to client");
+                println("Server may already be connected to client");
         }
         try {
             this.setSoTimeout(timeout);
             if (printOut)
-                System.out.println("Server - " + this.getInetAddress().getHostName() + " is waiting on " + this.getLocalPort() + "\nIP address: " + this.getInetAddress().getHostAddress());
-            handler.setClient(this.accept());
-            if (printOut)
-                System.out.println("Server - Just connected to " + handler.getClient().getRemoteSocketAddress() + "\nClient Name - " + handler.getClient().getInetAddress().getHostName() + "\nClient Address - " + handler.getClient().getInetAddress().getHostAddress());
+                println(this.getInetAddress().getHostName() + " is waiting on " + this.getLocalPort() + "\nIP address: " + this.getInetAddress().getHostAddress());
 
-            handler.setInputStream(new ObjectInputStream(handler.getClient().getInputStream()));
-            handler.setOutputStream(new ObjectOutputStream(handler.getClient().getOutputStream()));
+            handler = new ServerHandler(this.accept());
+
+            if (printOut)
+                println("Just connected to " + handler.getClient().getRemoteSocketAddress() + "\nClient Name - " + handler.getClient().getInetAddress().getHostName() + "\nClient Address - " + handler.getClient().getInetAddress().getHostAddress());
 
         } catch (IOException E) {
             println(E.toString());
@@ -110,100 +132,62 @@ public class EasyServerSocket extends ServerSocket {
      * This method allows you to send any objects to your connected Client
      *
      * @param object This is the object being sent to your Client
-     * @throws IOException Thrown when Output Stream is unable to write the object to itself
      */
 
     public void send(Object object) {
-        if (handler == null) {
+        if (handler == null)
             println("ServerHandler handler is null at " + this.getClass());
-        }
-        try {
-            this.handler.getOutputStream().writeObject(serialize(object));
-        } catch (IOException E) {
-            println(E.toString());
-        }
-    }
 
-    /**
-     * Helper method for the send(); function, turns Objects into byte[]
-     *
-     * @param obj This is the object being serialized
-     * @return serialized Object as a byte[]
-     * @throws IOException Thrown when Output Streams are unable to write the object to itself
-     */
-
-    private byte[] serialize(Object obj) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ObjectOutputStream os = new ObjectOutputStream(out);
-        os.writeObject(obj);
-        return out.toByteArray();
+        this.handler.send(object);
     }
 
     /**
      * This method waits until a Object is sent by a Client
      *
      * @return This returns the Object sent by the Client
-     * @throws IOException Thrown when Input Streams are unable to write the object to itself
      */
 
     public Object receive() {
-        if (handler == null) {
+        if (handler == null)
             println("ServerHandler handler is null at " + this.getClass());
-        }
-        try {
-            return deserialize((byte[]) this.handler.getInputStream().readObject());
-        } catch (ClassNotFoundException | IOException E) {
-            println(E.toString());
-        }
-        return null;
+
+        return this.handler.receive();
     }
 
-    /**
-     * Helper method for the receive(); method, Converts byte[] into an object
-     *
-     * @param data byte[] that needs to be converted
-     * @return This returns the converted Object
-     * @throws IOException Thrown when Output Streams are unable to write the object to itself
-     * @throws ClassNotFoundException Thrown when byte[] data is unable to be converted to an Object (byte[] is not serialized to an Object)
-     */
-
-    private Object deserialize(byte[] data) throws IOException, ClassNotFoundException {
-        ByteArrayInputStream in = new ByteArrayInputStream(data);
-        ObjectInputStream is = new ObjectInputStream(in);
-        return is.readObject();
-    }
 
     /**
-     * uses standard output and adds Server - and creates new line
+     * uses standard output and adds serverName - and creates new line
      *
      * @param print outputted text
      */
 
     public void println(String print) {
-        System.out.println("Server - " + print);
+        System.out.println(serverName + " - " + print);
     }
 
     /**
-     * uses standard output and adds Server -
+     * uses standard output and adds serverName -
      *
      * @param print outputted text
      */
 
     public void print(String print) {
-        System.out.print("Server - " + print);
+        System.out.print(serverName + " - " + print);
     }
 
     /**
      * Waits for inputted time
      *
      * @param time time to wait in milliseconds
+     * @throws InterruptedException At Thread.sleep()
+     * @see InterruptedException
      */
 
     public void sleep(int time) {
         try {
             Thread.sleep(time);
         } catch (InterruptedException E) {
-            System.out.println(E);
+            println(E.toString());
         }
     }
 

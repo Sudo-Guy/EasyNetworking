@@ -1,40 +1,73 @@
 package EasyNetworking.library;
 
-import java.io.*;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
 /**
+ * <h1>EasyClientSocket - EasyClientSocket simplifies the creation of client sockets allowing you to easily send data back and forth between a server without the extra hassle</h1>
+ *
+ * <p>
+ * EasyClientSocket simplifies the creation of client sockets allowing you to easily send data back and forth between a server without the extra hassle
+ * </p>
+ *
  * @author Hitesh Ale
- * Date - 5 / 20 / 2019
  * @version 0.1
+ * @see Socket
+ * @see ClientHandler
+ * @since 2019-05-20
  */
 
 public class EasyClientSocket extends Socket {
 
+    /**
+     * This ClientHandler creates and manages the ObjectInputStream and ObjectOutputStream connected to the server
+     */
+
     protected ClientHandler handler;
+
+    /**
+     * clientName is the String that will be printed before all class error messages and exceptions
+     */
+
+    protected String clientName;
 
 
     /**
-     * EasyClientSocket was made to make your life easy
-     * to create a EasyClientSocket
-     * EasyClientSocket nameOfVariable = new EasyClientSocket();
+     * This constructor calls the super(); constructor of Socket
+     * @see Socket
      */
 
     public EasyClientSocket() {
         super();
     }
 
+    /**
+     * This constructor calls the super(); constructor of Socket and clientName is instantiated (look at clientName documentation)
+     *
+     * @param clientName This is the String that will be printed
+     * @see Socket
+     */
+
+    public EasyClientSocket(String clientName) {
+        super();
+        this.clientName = clientName;
+    }
+
+    /**
+     * This method connect EasyClientSocket to a Server
+     *
+     * @param hostname This is either the name or ip of the server
+     * @param port     This is where the server is located on the local network
+     */
 
     public void connect(String hostname, int port) {
         try {
-            handler = new ClientHandler();
             println("Connecting...");
             super.connect(new InetSocketAddress(hostname, port));
             println("Connected to " + this.getInetAddress().getHostName());
 
-            handler.setOutputStream(new ObjectOutputStream(this.getOutputStream()));
-            handler.setInputStream(new ObjectInputStream(this.getInputStream()));
+            handler = new ClientHandler(this.getOutputStream(), this.getInputStream());
 
         } catch (IOException E) {
             println(E.toString());
@@ -42,95 +75,75 @@ public class EasyClientSocket extends Socket {
     }
 
     /**
-     * The send() method allows you to send anything to your client expect primitive variables
-     * primitives have to be converted to their Object counterparts
-     * char --> Character
-     * int --> Integer
-     * double --> Double
-     * boolean --> Boolean
-     * <p>
-     * Casting example
-     * int a = 100;
-     * nameOfVariable.send((Integer) a);
+     * This method allows you to send any objects to your connected Server
+     *
+     * @param object This is the object being sent to your Server
+     * @throws IOException Thrown when Output Stream is unable to write the object to itself
+     * @see ClientHandler
      */
 
-    public int send(Object object) {
-        try {
-            handler.getOutputStream().writeObject(serialize(object));
-            return 0;
-        } catch (IOException E) {
-            System.out.println(E);
-            return -1;
-        }
+    public void send(Object object) {
+        if (handler == null)
+            println("ClientHandler handler is null at " + this.getClass());
+
+        this.handler.send(object);
     }
 
     /**
-     * Helper method serialize allows Object to turn into byte[]
-     * This allows the method to send any Object to the client
-     * example
-     * Buffered Images can usually not be sent through a stream but this method converts all data to byte[] allowing it to be transferable
-     */
-
-    private byte[] serialize(Object obj) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ObjectOutputStream os = new ObjectOutputStream(out);
-        os.writeObject(obj);
-        return out.toByteArray();
-    }
-
-    /**
-     * The receive() method waits until the client has sent an Object
-     * if the method fails, null will be return
-     * <p>
-     * Note this method returns an object, Thus after returning the Object you will have to cast it to another type
-     * example
-     * (Assume client has sent a String)
-     * String message = (String) nameOfVariable.receive();
-     * DO NOT
-     * String message = nameOfVariable.receive();
-     * // this will cause an error
+     * This method waits until a Object is sent by a Server
+     *
+     * @return This returns the Object sent by the Server
+     * @see ClientHandler
      */
 
     public Object receive() {
-        try {
-            return deserialize((byte[]) handler.getInputStream().readObject());
-        } catch (ClassNotFoundException | IOException E) {
-            System.out.println(E);
-        }
-        return null;
+        if (handler == null)
+            println("ServerHandler handler is null at " + this.getClass());
+
+        return handler.receive();
     }
 
     /**
-     * Helper method deserialize allows byte[] turn into Object
-     * This allows the method to receive any byte[] to the client
-     * example
-     * Buffered Images can usually not be received through a stream but this method converts byte[] to Object allowing it to be transferable
+     * uses standard output and adds serverName - and creates new line
+     *
+     * @param print outputted text
      */
 
-    private Object deserialize(byte[] data) throws IOException, ClassNotFoundException {
-        ByteArrayInputStream in = new ByteArrayInputStream(data);
-        ObjectInputStream is = new ObjectInputStream(in);
-        return is.readObject();
+    private void println(String print) {
+        System.out.println(clientName + " - " + print);
     }
 
-    private void println(String print) {
-        System.out.println("Client - " + print);
-    }
+    /**
+     * uses standard output and adds serverName -
+     *
+     * @param print outputted text
+     */
 
     private void print(String print) {
-        System.out.print("Client - " + print);
+        System.out.print(clientName + " - " + print);
     }
+
+    /**
+     * Waits for inputted time
+     *
+     * @param time time to wait in milliseconds
+     * @throws InterruptedException At Thread.sleep()
+     * @see InterruptedException
+     */
 
     private void sleep(int time) {
         try {
             Thread.sleep(time);
         } catch (InterruptedException E) {
-            System.out.println(E);
+            println(E.toString());
         }
     }
 
     /**
-     * These methods allow you to access the internal methods of java.net.Socket & java.io.*
+     * Used to return handler and allows access to internal output and input streams connect to server
+     *
+     * @return Current ClientHandler
+     * @see ClientHandler
      */
 
     public ClientHandler getHandler() {

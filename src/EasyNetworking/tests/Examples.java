@@ -34,10 +34,8 @@ public class Examples {
                 serverSocket.send("hi Client");
                 println((String) serverSocket.receive());
             } catch (IOException E) {
-
+                System.out.println(E);
             }
-
-            System.out.println("*********************EXAMPLE*ONE**************************");
         }
 
         private void exampleTWO() {
@@ -50,7 +48,7 @@ public class Examples {
                 serverSocket = new EasyServerSocket(5000);
                 //Server is now waiting 10 seconds for client
                 serverSocket.accept(10000, true);
-                String text = "";
+                String text;
 
                 Scanner in = new Scanner(System.in);
 
@@ -110,6 +108,7 @@ public class Examples {
         }
 
         private void exampleTWO() {
+            sleep(250);
             System.out.println("*********************EXAMPLE*TWO**************************");
             sleep(1000);
 
