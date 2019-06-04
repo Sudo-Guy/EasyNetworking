@@ -30,7 +30,7 @@ public class EasyClientSocket extends Socket {
      * clientName is the String that will be printed before all class error messages and exceptions
      */
 
-    protected String clientName;
+    private String clientName;
 
 
     /**
@@ -98,7 +98,7 @@ public class EasyClientSocket extends Socket {
 
     public Object receive() {
         if (handler == null)
-            println("ServerHandler handler is null at " + this.getClass());
+            println("ClientHandler handler is null at " + this.getClass());
 
         return handler.receive();
     }
@@ -109,7 +109,7 @@ public class EasyClientSocket extends Socket {
      * @param print outputted text
      */
 
-    private void println(String print) {
+    public void println(String print) {
         System.out.println(clientName + " - " + print);
     }
 
@@ -119,7 +119,7 @@ public class EasyClientSocket extends Socket {
      * @param print outputted text
      */
 
-    private void print(String print) {
+    public void print(String print) {
         System.out.print(clientName + " - " + print);
     }
 
@@ -131,7 +131,7 @@ public class EasyClientSocket extends Socket {
      * @see InterruptedException
      */
 
-    private void sleep(int time) {
+    public void sleep(int time) {
         try {
             Thread.sleep(time);
         } catch (InterruptedException E) {
@@ -148,5 +148,9 @@ public class EasyClientSocket extends Socket {
 
     public ClientHandler getHandler() {
         return handler;
+    }
+
+    public String getClientName() {
+        return clientName;
     }
 }
