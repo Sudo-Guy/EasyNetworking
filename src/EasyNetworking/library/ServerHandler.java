@@ -1,6 +1,5 @@
 package EasyNetworking.library;
 
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -36,7 +35,7 @@ public class ServerHandler extends Handler {
      * @see ObjectInputStream
      * @see ObjectOutputStream
      */
-    public ServerHandler(@NotNull Socket client) {
+    public ServerHandler(Socket client) {
         this.client = client;
         try {
             in = new ObjectInputStream(client.getInputStream());

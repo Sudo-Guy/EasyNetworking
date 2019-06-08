@@ -40,6 +40,7 @@ public class EasyClientSocket extends Socket {
 
     public EasyClientSocket() {
         super();
+        clientName = "Client";
     }
 
     /**

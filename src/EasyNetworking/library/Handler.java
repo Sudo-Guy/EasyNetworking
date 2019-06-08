@@ -1,6 +1,5 @@
 package EasyNetworking.library;
 
-import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 
@@ -85,7 +84,7 @@ public class Handler {
      * @throws IOException Thrown when Output Streams are unable to write the object to itself
      */
 
-    protected byte[] serialize(@NotNull Object obj) throws IOException {
+    protected byte[] serialize(Object obj) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ObjectOutputStream os = new ObjectOutputStream(out);
         os.writeObject(obj);
@@ -120,10 +119,25 @@ public class Handler {
      * @throws ClassNotFoundException Thrown when byte[] data is unable to be converted to an Object (byte[] is not serialized to an Object)
      */
 
-    protected Object deserialize(@NotNull byte[] data) throws IOException, ClassNotFoundException {
+    protected Object deserialize(byte[] data) throws IOException, ClassNotFoundException {
         ByteArrayInputStream in = new ByteArrayInputStream(data);
         ObjectInputStream is = new ObjectInputStream(in);
         return is.readObject();
+    }
+
+    /**
+     * This method check if the Client or Server is responding
+     *
+     * @return returns true if Client or Socket is responding or returns false if system is not responding
+     */
+    public boolean isConnected() {
+        try {
+            if (in.read() == -1)
+                return true;
+        } catch (IOException E) {
+            System.out.println(this.getClass() + "  " + E.toString());
+        }
+        return false;
     }
 
     public ObjectInputStream getInputStream() {
