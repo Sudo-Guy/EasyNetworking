@@ -1,8 +1,10 @@
-package EasyNetworking;
+package EasyNetworking.tests;
+
+import EasyNetworking.library.EasyClientSocket;
+import EasyNetworking.library.EasyServerSocket;
 
 import java.io.IOException;
 import java.util.Scanner;
-
 public class Examples {
 
     public static void main(String[] args) {
@@ -29,13 +31,13 @@ public class Examples {
                 //Server is now waiting 10 seconds for client
                 serverSocket.accept(10000, true);
 
+                //sends hi Client to client
                 serverSocket.send("hi Client");
+                //prints out received String
                 println((String) serverSocket.receive());
             } catch (IOException E) {
-
+                System.out.println(E);
             }
-
-            System.out.println("*********************EXAMPLE*ONE**************************");
         }
 
         private void exampleTWO() {
@@ -48,14 +50,18 @@ public class Examples {
                 serverSocket = new EasyServerSocket(5000);
                 //Server is now waiting 10 seconds for client
                 serverSocket.accept(10000, true);
-                String text = "";
+                String text;
 
                 Scanner in = new Scanner(System.in);
 
+                //loops receiving and sending
                 do {
+                    //prints out Server -
                     print("");
                     text = in.nextLine();
+                    //sends inputted text
                     serverSocket.send(text);
+                    //prints out the received string
                     println((String) serverSocket.receive());
                 } while (!text.equalsIgnoreCase("exit"));
             } catch (IOException E) {
@@ -108,8 +114,9 @@ public class Examples {
         }
 
         private void exampleTWO() {
-            sleep(1000);
+            sleep(250);
             System.out.println("*********************EXAMPLE*TWO**************************");
+            sleep(1000);
 
             //Makes client wait 3 seconds to allow time for server to come online
             sleep(3000);
@@ -124,10 +131,13 @@ public class Examples {
 
             Scanner in = new Scanner(System.in);
 
+            //loops receiving and sending
             do {
+                //prints received String
                 println((String) clientSocket.receive());
                 print("");
                 text = in.nextLine();
+                //sends inputted string
                 clientSocket.send(text);
             } while (!text.equalsIgnoreCase("exit"));
         }
